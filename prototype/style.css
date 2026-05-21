@@ -1,0 +1,425 @@
+/* ─────────────────────────────────────────────────────────────────────
+   The Library — visual identity, v2.
+   ──────────────────────────────────
+   Pivot from "illustrated children's-book pebble" to "figure in a
+   mathematician's notebook." References: Conway, Berlekamp/Guy, Tufte.
+
+   The page is still paper. But:
+     1. No browns. No sand. Cool bone instead of warm cream.
+     2. No shading. No gradients. No textures inside figures. Ink only.
+     3. Warmth lives in the type and the marginalia. The diagram is cold.
+   ──────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── paper (cooled) ──────────────────────────────────────────── */
+  --paper:        #e8e3d4;   /* cool bone, primary surface            */
+  --paper-edge:   #cdc5b1;   /* darkened bone near spine / edge       */
+  --paper-fold:   rgba(40, 36, 26, 0.18); /* spine vignette ink       */
+  --paper-shadow: #0c0d10;   /* the dark room outside the book        */
+
+  /* ── ink (cooled) ────────────────────────────────────────────── */
+  --ink:        #161825;     /* primary diagram ink                   */
+  --ink-soft:   #242838;     /* secondary type, caption               */
+  --ink-faded:  #6c6e7a;     /* old graphite / faint marks            */
+  --ink-pencil: #2f3346;     /* pencil weight for marginalia          */
+
+  /* ── tide ────────────────────────────────────────────────────── */
+  --tide:        #5e7a8a;    /* faint horizon-blue, dashed line       */
+
+  /* ── type ────────────────────────────────────────────────────── */
+  --serif: "Spectral", "Cardo", "Iowan Old Style", "Sitka Text", Georgia, serif;
+  --hand:  "Reenie Beanie", "Bradley Hand", "Comic Sans MS", cursive;
+
+  /* ── motion ──────────────────────────────────────────────────── */
+  --t-flip:    420ms cubic-bezier(0.32, 0.04, 0.32, 1);
+  --t-arm:     220ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  --t-settle: 2200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { color-scheme: light; }
+
+body {
+  min-height: 100vh;
+  /* Cool dark void around the book, no brown cast. */
+  background:
+    radial-gradient(ellipse at 50% 38%, #14161c 0%, #07080a 80%);
+  font-family: var(--serif);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(18px, 4vw, 56px);
+}
+
+/* ─── book / page ───────────────────────────────────────────────── */
+
+.binding {
+  width: 100%;
+  max-width: 940px;
+  filter:
+    drop-shadow(0 24px 48px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 6px 12px rgba(0, 0, 0, 0.40));
+}
+
+.page {
+  position: relative;
+  min-height: 720px;
+  padding: clamp(56px, 7%, 92px) clamp(40px, 5%, 60px) clamp(72px, 10%, 110px);
+
+  background-color: var(--paper);
+  /* Three layers, all cool:
+       1. Spine-side vignette down the left edge.
+       2. Faint corner darkening at top-right (page top).
+       3. SVG fractal noise as cool paper grain. */
+  background-image:
+    linear-gradient(90deg,
+      var(--paper-fold) 0%,
+      rgba(40, 36, 26, 0.04) 5%,
+      transparent 14%,
+      transparent 92%,
+      rgba(40, 36, 26, 0.04) 98%,
+      rgba(40, 36, 26, 0.10) 100%),
+    radial-gradient(ellipse 50% 30% at 95% 4%,
+      rgba(30, 30, 40, 0.10), transparent 70%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9'/><feColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.08  0 0 0 0 0.09  0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-blend-mode: multiply, multiply, multiply;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.05),
+    inset 22px 0 50px -28px rgba(20, 22, 30, 0.20),
+    inset -10px 0 30px -16px rgba(20, 22, 30, 0.08),
+    inset 0 12px 24px -16px rgba(20, 22, 30, 0.08),
+    inset 0 -16px 32px -16px rgba(20, 22, 30, 0.10);
+}
+
+.page.is-solved {
+  transition: filter var(--t-settle);
+  filter: brightness(0.99);
+}
+
+/* ─── title / header ────────────────────────────────────────────── */
+
+.page-header {
+  text-align: center;
+  margin-bottom: clamp(40px, 6vh, 72px);
+}
+.page-numeral {
+  display: block;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.36em;
+  color: var(--ink-faded);
+  margin-bottom: 14px;
+  text-indent: 0.36em;
+}
+.page-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-style: normal;
+  font-size: clamp(36px, 5vw, 54px);
+  letter-spacing: 0.005em;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1;
+}
+
+/* ─── plate grid: figure | margin column ────────────────────────── */
+
+.plate {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(180px, 22%, 230px);
+  gap: clamp(28px, 4%, 56px);
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .plate {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+/* ─── illustration ──────────────────────────────────────────────── */
+
+.illustration {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(20px, 3vh, 32px);
+}
+.illustration svg {
+  width: 100%;
+  max-width: 580px;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+.figure-caption {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(13px, 1.05vw, 14.5px);
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+  text-align: center;
+  max-width: 460px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ─── pebble interaction states (Puzzle 001) ────────────────────── */
+
+.pebble { cursor: default; }
+
+/* Wet fill — toggled via opacity for a slow crossfade. */
+.pebble-fill { transition: opacity var(--t-flip); }
+.pebble[data-state="dry"] .pebble-fill { opacity: 0; }
+.pebble[data-state="wet"] .pebble-fill { opacity: 1; }
+
+/* Hover lift: extremely small. This is a diagram, not a button. */
+.pebble-lift {
+  transform: translateY(0);
+  transition: transform var(--t-arm);
+}
+.illustration.is-armed .pebble.is-armed .pebble-lift {
+  transform: translateY(-2px);
+}
+
+/* The pair-bracket marks beneath an armed pair — drawn-in faintly. */
+.pair-bracket {
+  opacity: 0;
+  transition: opacity var(--t-arm);
+}
+.illustration.is-armed .pair-bracket.is-armed {
+  opacity: 0.62;
+}
+
+/* ─── pair-zone hit target ──────────────────────────────────────── */
+
+.pair-zone {
+  fill: transparent;
+  cursor: pointer;
+}
+.illustration.is-locked .pair-zone {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ─── inkwell interaction states (Puzzle 002) ───────────────────── */
+/* These styles ADD vocabulary for vessel-with-fill figures; they do
+   not modify any v2 identity rule above. */
+
+.inkwell { cursor: default; }
+
+.inkwell-zone {
+  fill: transparent;
+  cursor: pointer;
+}
+.illustration.is-locked .inkwell-zone {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Ink level — the central inkwell animation. The fill group is
+   translated via SVG `transform` attribute (set by JS on each pour);
+   CSS animates that transform. Pour duration is intentionally slower
+   than --t-flip — ink takes longer to settle than a stone takes to
+   wet. */
+.ink-fill {
+  transition: transform 720ms cubic-bezier(0.32, 0.02, 0.30, 1);
+}
+
+/* Hover lift on the GIVER only (the well the player has chosen to
+   take from). Receivers don't lift — they're being acted upon. */
+.inkwell .inkwell-lift {
+  transform: translateY(0);
+  transition: transform var(--t-arm);
+}
+.illustration.is-armed .inkwell.is-giver .inkwell-lift {
+  transform: translateY(-3px);
+}
+
+/* Hover annotation marker — fades in on any inkwell that has a role
+   in the proposed pour (giver shows "−2"; receivers show "+1"). */
+.well-marker {
+  opacity: 0;
+  transition: opacity var(--t-arm);
+}
+.illustration.is-armed .inkwell.is-armed .well-marker {
+  opacity: 0.78;
+}
+
+/* Solved gestures are per-puzzle. p001 had a crossed-out predecessor
+   line followed by a single word. p002 has a single word, no
+   strike-through — quieter still. .hm-note--solo skips the crossed
+   span styling. */
+.hm-note.hm-note--solo {
+  text-align: center;
+}
+
+/* ─── marginalia ─────────────────────────────────────────────────── */
+
+.marginalia {
+  font-family: var(--hand);
+  color: var(--ink-pencil);
+  /* In flow, in the margin column. Slight tilt for character. */
+  transform: rotate(-1.4deg);
+  transform-origin: 60% 0;
+  padding-top: clamp(40px, 8%, 80px);
+}
+.hm-note {
+  margin: 0;
+  font-size: clamp(22px, 1.95vw, 26px);
+  line-height: 1.35;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+}
+.hm-sig {
+  display: block;
+  margin-top: 4px;
+  text-align: right;
+  font-style: italic;
+  font-family: var(--serif);
+  font-size: 0.62em;
+  color: var(--ink-faded);
+  letter-spacing: 0.04em;
+}
+
+/* The solved note. */
+.hm-note--solved {
+  margin-top: 26px;
+  text-align: left;
+  font-size: clamp(24px, 2.1vw, 28px);
+  line-height: 1.25;
+  transform: rotate(2.6deg);
+  transform-origin: 0 50%;
+
+  opacity: 0;
+  transition: opacity 1.6s ease 0.5s;
+}
+.hm-note--solved .crossed {
+  display: inline-block;
+  color: var(--ink-pencil);
+  position: relative;
+  margin-right: 0.4em;
+}
+.hm-note--solved .crossed::after {
+  content: "";
+  position: absolute;
+  left: -3%;
+  right: -3%;
+  top: 54%;
+  height: 1.6px;
+  background:
+    linear-gradient(90deg,
+      rgba(38, 42, 60, 0.0) 0%,
+      rgba(38, 42, 60, 0.88) 8%,
+      rgba(38, 42, 60, 0.92) 90%,
+      rgba(38, 42, 60, 0.0) 100%);
+  transform: rotate(-1.6deg);
+}
+.page.is-solved .hm-note--solved {
+  opacity: 1;
+}
+
+/* ─── small-viewport overrides ──────────────────────────────────── */
+@media (max-width: 760px) {
+  .marginalia {
+    padding-top: 0;
+    transform: rotate(-1deg);
+    transform-origin: 0 0;
+  }
+  .illustration svg { max-width: 100%; }
+}
+
+/* ─── motion: respect reduced-motion ─────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-flip: 0ms;
+    --t-arm: 0ms;
+    --t-settle: 0ms;
+  }
+  .hm-note--solved { transition: none; }
+}
+
+/* ─── foreword / flyleaf (Puzzle 000) ────────────────────────────── */
+/* The book's flyleaf, before Page I. No figure, no marginalia — just
+   a short note from H.M. and a "I." link that turns the page. */
+
+.foreword {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: clamp(16px, 4vh, 40px);
+}
+
+.foreword-header {
+  margin-bottom: clamp(48px, 9vh, 96px);
+}
+
+.foreword-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(20px, 2.2vw, 26px);
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.foreword-body {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.75;
+  color: var(--ink);
+  max-width: 480px;
+  letter-spacing: 0.005em;
+  text-align: left;
+}
+
+.foreword-body p {
+  margin: 0 0 1.5em;
+}
+
+.foreword-signature {
+  font-family: var(--hand);
+  font-style: normal;
+  font-size: 22px;
+  color: var(--ink-pencil);
+  margin-top: 2.4em !important;
+  transform: rotate(-1.4deg);
+  transform-origin: 0 50%;
+  display: inline-block;
+}
+
+/* The "I." link at the bottom. Styled as a page numeral so it reads
+   as a quiet invitation rather than a UI button. */
+.page-link {
+  display: inline-block;
+  margin-top: clamp(56px, 11vh, 112px);
+  padding: 6px 18px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 0.36em;
+  text-indent: 0.36em;
+  color: var(--ink-faded);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color var(--t-arm), border-color var(--t-arm);
+}
+.page-link:hover,
+.page-link:focus-visible {
+  color: var(--ink);
+  border-bottom-color: var(--ink-soft);
+  outline: none;
+}
